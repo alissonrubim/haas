@@ -1,11 +1,10 @@
 import { Console } from "console";
 import { App } from "../../types/App";
+import { AppSubscription } from "../../types/AppSubscription";
 
-export default async function register(app: App){
-  app.haas.subscribe({
-    id: "LIG.00001", 
-    name: "Handle Alisson's Office Light Switch", 
-    config: {
+export default async function register(app: App): Promise<AppSubscription>{
+  return {
+    subscription: {
       byEntityEvent: {
         entityId: app.devices.switches.alissons_office_lights_switch.entities.main
       }
@@ -25,5 +24,5 @@ export default async function register(app: App){
         await app.haas.instance.services.switch.toggle(app.devices.lighs.living_room_lamp.entities.main)
       }
     }
-  })
+  }
 }

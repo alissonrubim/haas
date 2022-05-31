@@ -18,6 +18,10 @@ export class HomeAssistantInstancePublicServices {
   input_boolean =  {
     turn_on: async (entityId: string) => await this.#instance.callService("input_boolean", "turn_on", { entity_id: entityId })
   }
+  media_player = {
+    set_volume: async (entityId: string, volume: number) => await this.#instance.callService("media_player", "volume_set", { entity_id: entityId, volume_level: `${volume}` })
+  }
   notify = async (entityId: string, data: any) => await this.#instance.callService("notify", entityId, data);
+  tts = async (entityId: string, message: string) => await this.#instance.callService("tts", "cloud_say", { entity_id: entityId, message: message })
   call = async (domain: string, service: string, data?: any) => await this.#instance.callService(domain, service, data);
 }

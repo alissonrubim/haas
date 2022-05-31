@@ -1,12 +1,10 @@
 import { App } from "../../types/App";
 import { sendNotification } from "../../helpers/sendNotificationHelper";
+import { AppSubscription } from "../../types/AppSubscription";
 
-export default async function register(app: App){
-  return false;
-  app.haas.subscribe({
-    id: "RMD.00002", 
-    name: "Reminder - Trash Day - Plastic", 
-    config: {
+export default async function register(app: App): Promise<AppSubscription>{
+  return {
+    subscription: {
       bySchedule: {
         cron: {
           hour: [8, 10],
@@ -26,8 +24,12 @@ export default async function register(app: App){
         app: {
           title: "Reminder - Trash Day",
           message: "Today is organic trash day!"
+        },
+        voice: {
+          message: "Hi, good morning. Do not forget to remove the trash. Today is organic trash day!",
+          volume: 60
         }
       })
     }
-  })
+  }
 }

@@ -7,14 +7,10 @@ export default async function register(app: App): Promise<AppSubscription>{
     subscription: {
       bySchedule: {
         cron: {
-          hour: {
-            entity: app.devices.configuration.trash_reminder_schedule_time.entities.main,
-          },
-          minute: {
-            entity: app.devices.configuration.trash_reminder_schedule_time.entities.main,
-          },
+          hour: [8, 10],
+          minute: 30,
           weekDays: {
-            thursday: true
+            monday: true
           }
         }
       }
@@ -27,10 +23,10 @@ export default async function register(app: App): Promise<AppSubscription>{
       sendNotification(app, {
         app: {
           title: "Reminder - Trash Day",
-          message: "Today is plastic trash day!"
+          message: "Today is general trash day!"
         },
         voice: {
-          message: "Hi, good morning. Do not forget to remove the trash. Today is plastic trash day!",
+          message: "Hi, good morning. Do not forget to remove the trash. Today is general trash day!",
           volume: 60
         }
       })

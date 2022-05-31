@@ -1,13 +1,11 @@
 import { App } from "../../types/App";
 import { wait } from "../../helpers/untils";
 import { sendNotification } from "../../helpers/sendNotificationHelper";
+import { AppSubscription } from "../../types/AppSubscription";
 
-export default async function register(app: App){
-  return false;
-  app.haas.subscribe({
-    id: "CLE.00001", 
-    name: "Start Vaccum Cleaner Periodically", 
-    config: {
+export default async function register(app: App): Promise<AppSubscription> {
+  return {
+    subscription: {
       bySchedule: {
         cron: {
           hour: 12,
@@ -56,5 +54,5 @@ export default async function register(app: App){
         await app.haas.instance.services.input_boolean.turn_on(app.devices.configuration.vaccum_cleaner_should_run_next_cleaning_automation.entities.main);
       }
     }
-  })
+  }
 }

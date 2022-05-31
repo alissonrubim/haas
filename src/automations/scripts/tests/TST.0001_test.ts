@@ -1,11 +1,9 @@
 import { App } from "../../types/App";
+import { AppSubscription } from "../../types/AppSubscription";
 
-export default async function register(app: App){
-  return false;
-  app.haas.subscribe({
-    id: "TST.00002", 
-    name: "Test", 
-    config: {
+export default async function register(app: App): Promise<AppSubscription>{
+  return {
+    subscription: {
       byEntityEvent: {
         entityId: app.devices.climate.ventilation_system.entities.main
       }
@@ -16,5 +14,5 @@ export default async function register(app: App){
     handler: async () => {
       console.info("Foi!")
     }
-  })
+  }
 }

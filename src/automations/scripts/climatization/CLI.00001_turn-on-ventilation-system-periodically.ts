@@ -1,12 +1,10 @@
 import { App } from "../../types/App";
 import { wait } from "../../helpers/untils";
+import { AppSubscription } from "../../types/AppSubscription";
 
-export default async function register(app: App){
-  return false;
-  app.haas.subscribe({
-    id: "CLI.00001", 
-    name: "Turn On Vertilation System Periodically", 
-    config: {
+export default async function register(app: App): Promise<AppSubscription>{
+  return {
+    subscription: {
       bySchedule: [{
         cron: {
           hour: 9,
@@ -31,5 +29,5 @@ export default async function register(app: App){
 
       await app.haas.instance.services.switch.turn_off(app.devices.climate.ventilation_system.entities.main);
     }
-  })
+  }
 }

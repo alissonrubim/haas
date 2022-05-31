@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as dotenv from 'dotenv';
 import { Haas } from '@haas/core';
 import devices from './devices';
+import { AppSubscription } from './types/AppSubscription';
 
 const main = async () => {
   dotenv.config({
@@ -31,9 +32,17 @@ const main = async () => {
   //Run each script
   files.forEach(async (file) => {
     const fileImport = await import(`./${file}`);
-    fileImport.default({
+    const subscription = await fileImport.default({
       haas,
       devices
+    }) as AppSubscription;
+
+    haas.subscribe({
+      id: path.basename(file).split('_')[0],
+      name: path.basename(file),
+      config: subscription.subscription,
+      handler: subscription.handler,
+      condition: subscription.condition
     })
   })
 

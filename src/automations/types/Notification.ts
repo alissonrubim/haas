@@ -1,23 +1,29 @@
-export default interface NotificationRequest {
-  app?: {
+export interface AppNotificationRequest {
+  title: string,
+  message: string,
+  entity?: string | string[],
+  actions?: {
+    action: string,
     title: string,
-    message: string,
-    entity?: string | string[],
-    actions?: {
-      action: string,
-      title: string,
-      url?: string,
-    }[]
-  },
-  voice?: {
-    message: string,
-    entity?: string | string[],
-    volume?: number
-  },
-  media?: {
-    type: string,
-    path: string,
-    entity?: string | string[],
-    volume?: number
-  }
+    url?: string,
+  }[]
+}
+
+export interface VoiceNotificationRequest {
+  message: string,
+  entity?: string | string[],
+  volume?: number
+}
+
+export interface MediaNotificationRequest {
+  type: string,
+  path: string,
+  entity?: string | string[],
+  volume?: number
+}
+
+export interface NotificationRequest {
+  app?: AppNotificationRequest,
+  voice?: VoiceNotificationRequest,
+  media?: MediaNotificationRequest
 }
