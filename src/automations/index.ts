@@ -5,13 +5,21 @@ import { Haas } from '@haas/core';
 import devices from './devices';
 import { AppSubscription } from './types/AppSubscription';
 
+const getArgs = (name: string): string | undefined => {
+  if(process.argv.indexOf(`--${name}`) > 0)
+    return process.argv[process.argv.indexOf(`--${name}`) + 1];
+  return undefined;
+}
+
 const main = async () => {
   dotenv.config({
     path: ".env"
   });
   const haHost = process.env.HOME_ASSISTANT_HOST ?? ""
   const haPort = parseInt(process.env.HOME_ASSISTANT_PORT ?? "0")
-  const haAccessToken = process.env.HOME_ASSISTANT_ACESS_TOKEN ?? ""
+  const haAccessToken = process.env.HOME_ASSISTANT_ACESS_TOKEN ?? "";
+  const runScriptId = getArgs('run');
+  const registerOnly = getArgs('only');
 
   const haas = new Haas(haHost, haPort, haAccessToken);
 
@@ -31,6 +39,11 @@ const main = async () => {
 
   //Run each script
   files.forEach(async (file) => {
+    const id = path.basename(file).split('_')[0];
+
+    if(registerOnly && id !== registerOnly)
+      return;
+
     const fileImport = await import(`./${file}`);
     const subscription = await fileImport.default({
       haas,
@@ -38,7 +51,7 @@ const main = async () => {
     }) as AppSubscription;
 
     haas.subscribe({
-      id: path.basename(file).split('_')[0],
+      id: id,
       name: path.basename(file),
       config: subscription.subscription,
       handler: subscription.handler,
@@ -48,10 +61,8 @@ const main = async () => {
 
   await haas.start();
 
-  if(process.argv.indexOf("--run") > 0){
-    const subscriptionId = process.argv[process.argv.indexOf("--run") + 1];
-    haas.triggerSubscriptionById(subscriptionId)
-  }
+  if(runScriptId)
+    haas.triggerSubscriptionById(runScriptId)
 }
 
 main();

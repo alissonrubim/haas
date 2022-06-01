@@ -7,8 +7,10 @@ export default async function register(app: App): Promise<AppSubscription>{
     subscription: {
       bySchedule: [{
         cron: {
-          hour: 9,
-          minute: 0
+          hour: 11,
+          minute: {
+            entity: app.devices.configuration.trash_reminder_schedule_time.entities.main,
+          },
         }
       }, {
         cron: {

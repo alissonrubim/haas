@@ -7,62 +7,65 @@ import {
   ByScheduleConfig,
   ByScheduleConfigCronField,
   DateTimeEntity,
-  Subscription, SubscriptionArgs, SubscriptionConfig,
+  Subscription, SubscriptionArgs,
 } from './types';
 
-interface RegisteredSubscription {
-  id: string,
-  subscription: Subscription,
-  controll: {
-    cronScheduledTask?: cron.ScheduledTask,
-    eventSubscriptionId?: string,
+interface RegisteredEventSubscription {
+  entityId: string,
+  subscriptionEventId: string
+}
+
+interface RegisteredScheduleSubscription {
+  task: cron.ScheduledTask,
+  expression: string
+}
+
+interface RegisteredSubscription extends Subscription {
+  _isProcessed: boolean,
+  _eventsControll: {
+    scheduleSubscriptions?: RegisteredScheduleSubscription[],
+    eventSubscription?: RegisteredEventSubscription[]
   }
 }
 
 export class Haas {
-  #subscriptions: Subscription[] = [];
-  #registeredSubscriptions: RegisteredSubscription[] = [];
+  #subscriptions: RegisteredSubscription[] = [];
   #homeAssistantInstance: HomeAssistantInstance;
   instance: HomeAssistantInstancePublic;
 
-  async #triggerSubscription(subscriotion: Subscription, args: SubscriptionArgs){
+  // This triggers the subscription handler
+  async #triggerSubscription(sub: Subscription, args: SubscriptionArgs){
     try{
-      if(subscriotion.condition ? await subscriotion.condition(args) : true){
-        console.info(new Date(), `[${subscriotion.id}-${subscriotion.name}]: Subscription handler trigged.`)
-        await subscriotion.handler(args)
-        console.info(new Date(), `[${subscriotion.id}-${subscriotion.name}]: Subscription handler done.`)
+      if(sub.condition ? await sub.condition(args) : true){
+        console.info(new Date(), `[${sub.id}-${sub.name}]: Subscription handler trigged.`)
+        await sub.handler(args)
+        console.info(new Date(), `[${sub.id}-${sub.name}]: Subscription handler done.`)
       }
     }catch(e){
       console.error("An error ocurred:", e)
     }
   }
 
-
-  async #processSubscriptionsBySchedule(sub: Subscription){
-    const registerCronExpression = (expression: string) => {
-      const cronScheduledTask = cron.schedule(expression, async () => {
+  async #processSubscriptionsBySchedule(sub: Subscription): Promise<RegisteredScheduleSubscription[]> {
+    const registerCronExpression = (expression: string): cron.ScheduledTask => {
+      return cron.schedule(expression, async () => {
         const args = {
           scheduleArgs: {}
         };
 
         await this.#triggerSubscription(sub, args)
-      })
-
-      this.#registeredSubscriptions.push({
-        id: sub.id,
-        subscription: sub,
-        controll: {
-          cronScheduledTask
-        }
-      })
+      });
     }
 
-    const processSchedule = async (schedule: ByScheduleConfig) => {
+    const processSchedule = async (schedule: ByScheduleConfig): Promise<RegisteredScheduleSubscription | undefined> => {
       if(!schedule.expression && !schedule.cron)
         throw new Error("When configuring a subscription, you must define `cron` or `expression` property.")
 
       if(schedule.expression)
-        registerCronExpression(schedule.expression)
+        return {
+          expression: schedule.expression,
+          task: registerCronExpression(schedule.expression)
+        }
 
       if(schedule.cron){
         const getExpression = async (property: "second" | "hour" | "minute" | "day"): Promise<string | number> => {
@@ -92,11 +95,20 @@ export class Haas {
               const dateTimeEntity = conProperty as DateTimeEntity;
               const date = await this.instance.states.getDateTime(dateTimeEntity.entity, "HH:mm:ss");
 
-              // this.#homeAssistantInstance.subscribeToStateChange(dateTimeEntity.entity, async (entityId, newState, oldState) => {
-              //   this.unsubscribe(sub.id);
-              //   this.subscribe(sub);
-              //   this.#processSubscription(sub);
-              // });
+              // const registeredSub = this.#subscriptions.find((x) => x.id === sub.id);
+              // if(!registeredSub?._eventsControll.eventSubscription?.find((x) => x.entityId == dateTimeEntity.entity)){
+              //   const subscriptionEventId = this.#homeAssistantInstance.subscribeToStateChange(dateTimeEntity.entity, async (entityId, newState, oldState) => {
+              //     this.unsubscribe(sub.id);
+              //     this.subscribe(sub);
+              //     await this.process(sub);
+              //     console.info(this.#subscriptions.find((x) => x.id === sub.id)?._eventsControll.scheduleSubscriptions)
+              //   });
+
+              //   registeredSub?._eventsControll.eventSubscription?.push({
+              //     entityId: dateTimeEntity.entity,
+              //     subscriptionEventId
+              //   })
+              // }
 
               return returnPieceFromDate(date, dateTimeEntity.piece ?? property);
             }
@@ -120,8 +132,14 @@ export class Haas {
         const weekDays = schedule.cron.weekDays ? Object.entries(schedule.cron.weekDays).map(([key, value]) => value ? key.slice(0, 3) : "").filter((x) => x).join(",") : null;
         const month = schedule.cron.month ? Object.entries(schedule.cron.month).map(([key, value]) => value ? key.slice(0, 3) : "").filter((x) => x).join(",") : null;
         const expression = `${await getExpression("minute")} ${await getExpression("hour")} ${await getExpression("day")} ${month ?? "*"} ${weekDays ?? "*"}`;
-        registerCronExpression(expression);
+
+        return {
+          expression: expression,
+          task: registerCronExpression(expression)
+        }
       }
+
+      return undefined;
     }
 
     let schedules: ByScheduleConfig[] = []
@@ -130,47 +148,52 @@ export class Haas {
     else
       schedules = sub.config.bySchedule as ByScheduleConfig[];
 
-    for(const schedule of schedules)
-      await processSchedule(schedule)
+    const schedulesTasks: RegisteredScheduleSubscription[] = [];
+    for(const schedule of schedules){
+      const scheduleTask = await processSchedule(schedule)
+      if(scheduleTask){
+        schedulesTasks.push(scheduleTask);
+      }
+    }
+
+    return Promise.resolve(schedulesTasks);
   }
 
-  #processSubscriptionsByEntityEvent(sub: Subscription){
-    if(sub.config.byEntityEvent){
-      const eventSubscriptionId = this.#homeAssistantInstance.subscribeToStateChange(sub.config.byEntityEvent?.entityId, async (entityId, newState, oldState) => {
-        const args = {
-          entityEventArgs: {
-            entityId,
-            newState,
-            oldState
-          }
+  #processSubscriptionsByEntityEvent(sub: Subscription): RegisteredEventSubscription {
+    const subscriptionEventId = this.#homeAssistantInstance.subscribeToStateChange(sub.config.byEntityEvent?.entityId ?? '', async (entityId, newState, oldState) => {
+      const args = {
+        entityEventArgs: {
+          entityId,
+          newState,
+          oldState
         }
+      }
 
-        await this.#triggerSubscription(sub, args)
-      });
+      await this.#triggerSubscription(sub, args)
+    });
 
-      this.#registeredSubscriptions.push({
-        id: sub.id,
-        subscription: sub,
-        controll: {
-          eventSubscriptionId
-        }
-      })
-      
+    return {
+      entityId: sub.config.byEntityEvent?.entityId ?? '',
+      subscriptionEventId,
     }
   }
 
   async #processSubscriptions(){
-    for(const sub of this.#subscriptions)
+    for(const sub of this.#subscriptions.filter((x) => !x._isProcessed))
       await this.#processSubscription(sub);
   }
 
-  async #processSubscription(sub: Subscription){
-    if(sub.config.bySchedule){
-      await this.#processSubscriptionsBySchedule(sub)
-    }
-    if(sub.config.byEntityEvent){
-      this.#processSubscriptionsByEntityEvent(sub)
-    }
+  async #processSubscription(sub: RegisteredSubscription){
+    if(sub._isProcessed)
+      throw new Error(`Subscriotion ${sub.id} already processed!`)
+
+    if(sub.config.bySchedule)
+      sub._eventsControll.scheduleSubscriptions = await this.#processSubscriptionsBySchedule(sub);
+
+    if(sub.config.byEntityEvent)
+      sub._eventsControll.eventSubscription = [this.#processSubscriptionsByEntityEvent(sub)]
+
+    sub._isProcessed = true;
   }
 
   constructor(host: string, port: number, accessToken: string) {
@@ -178,38 +201,52 @@ export class Haas {
     this.instance = this.#homeAssistantInstance.getExposedInstance();
   }
 
-  public subscribe(subscription: Subscription){
-    this.#subscriptions.push(subscription);
+  public async process(sub: Subscription){
+    const subscription = this.#subscriptions.find((x) => x.id === sub.id);
+    if(!subscription)
+      throw new Error(`Subscription ${sub.id} not found!`)
+    
+    await this.#processSubscription(subscription);
   }
 
-  public unsubscribe(subscriotionId: string){
-    const subscription = this.#subscriptions.find((x) => x.id === subscriotionId);
-    if(subscription){
-      this.#subscriptions.splice(this.#subscriptions.indexOf(subscription), 1);
-
-      const removeRegisteredSubscriptions: RegisteredSubscription[] = [];
-      this.#registeredSubscriptions.filter((x) => x.id === subscriotionId).forEach((s) => {
-        if(s.controll.cronScheduledTask){
-          s.controll.cronScheduledTask.stop();
-          s.controll.cronScheduledTask = undefined;
+  public subscribe(sub: Subscription){
+    const subscription = this.#subscriptions.find((x) => x.id === sub.id);
+    if(!subscription){
+      this.#subscriptions.push({
+        ...sub,
+        _isProcessed: false,
+        _eventsControll: {
+          eventSubscription: [],
+          scheduleSubscriptions: []
         }
-        if(s.controll.eventSubscriptionId){
-          this.#homeAssistantInstance.unsubscribeToStateChange(s.controll.eventSubscriptionId)
-        }
-
-        removeRegisteredSubscriptions.push(s)
       });
-
-      removeRegisteredSubscriptions.forEach((s) => {
-        this.#registeredSubscriptions.splice(this.#registeredSubscriptions.indexOf(s), 1);
-      })
+    }else{
+      throw new Error(`Subscription id ${sub.id} already in use!`)
     }
   }
 
+  public unsubscribe(subId: string){
+    const subscription = this.#subscriptions.find((x) => x.id === subId);
+    if(subscription){
+      this.#subscriptions.splice(this.#subscriptions.indexOf(subscription), 1);
+
+      if(subscription._isProcessed){
+        subscription._eventsControll.scheduleSubscriptions?.forEach((scheduleSub) => {
+          scheduleSub.task.stop();
+        })
+
+        subscription._eventsControll.eventSubscription?.forEach((subEvent) => {
+          this.#homeAssistantInstance.unsubscribeToStateChange(subEvent.entityId)
+        })
+      }
+    }
+  }
+
+  // Run a subscription base on the subscriptionId
   public triggerSubscriptionById(id: string){
-    const registeredSubscription = this.#registeredSubscriptions.find((x) => x.subscription.id === id); 
+    const registeredSubscription = this.#subscriptions.find((x) => x.id === id && x._isProcessed); 
     if(registeredSubscription)
-      this.#triggerSubscription(registeredSubscription.subscription, {})
+      this.#triggerSubscription(registeredSubscription, {})
     else
       throw new Error(`Subscription ${id} not found!`);
   }
@@ -223,7 +260,7 @@ export class Haas {
 
     console.info(`\n\nRegistering subscriptions....`)
     await this.#processSubscriptions();
-    console.info(`${this.#subscriptions.length} subscriptions registered successfully!`);
+    console.info(`${this.#subscriptions.filter((x) => x._isProcessed === true).length} subscriptions registered successfully!`);
 
     console.info("\n\nHaas successfully started at", new Date(), "\n\n")
   }
