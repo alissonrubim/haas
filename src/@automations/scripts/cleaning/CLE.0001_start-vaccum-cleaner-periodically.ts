@@ -1,7 +1,8 @@
-import { App } from "../../types/App";
+import { App } from "@haas/app/types/App";
 import { wait } from "../../helpers/untils";
 import { sendNotification } from "../../helpers/sendNotificationHelper";
-import { AppSubscription } from "../../types/AppSubscription";
+import { AppSubscription } from "@haas/app/types/AppSubscription";
+import devices from '../../devices';
 
 export default async function register(app: App): Promise<AppSubscription> {
   return {
@@ -19,11 +20,11 @@ export default async function register(app: App): Promise<AppSubscription> {
       }
     },
     condition: async () => {
-      const isOnVacation = await app.haas.instance.states.getBoolean(app.devices.configuration.on_vocation.entities.main);
+      const isOnVacation = await app.haas.instance.states.getBoolean(devices.configuration.on_vocation.entities.main);
       return !isOnVacation
     },
     handler: async () => {
-      const vaccumCleanerEntity = await app.haas.instance.getEntity(app.devices.cleaning.vaccum_cleaner.entities.main);
+      const vaccumCleanerEntity = await app.haas.instance.getEntity(devices.cleaning.vaccum_cleaner.entities.main);
       const hasError = vaccumCleanerEntity?.state === "error"
       const hasBaterry = vaccumCleanerEntity?.attributes.baterry_level > 75;
 
@@ -47,11 +48,11 @@ export default async function register(app: App): Promise<AppSubscription> {
     
       await wait({ seconds: 20, minutes: 1 });
 
-      const shoudlStartCleaning = await app.haas.instance.states.getBoolean(app.devices.configuration.vaccum_cleaner_should_run_next_cleaning_automation.entities.main);
+      const shoudlStartCleaning = await app.haas.instance.states.getBoolean(devices.configuration.vaccum_cleaner_should_run_next_cleaning_automation.entities.main);
       if(shoudlStartCleaning){
-        await app.haas.instance.services.vaccum.start(app.devices.cleaning.vaccum_cleaner.entities.main)
+        await app.haas.instance.services.vaccum.start(devices.cleaning.vaccum_cleaner.entities.main)
       }else{
-        await app.haas.instance.services.input_boolean.turn_on(app.devices.configuration.vaccum_cleaner_should_run_next_cleaning_automation.entities.main);
+        await app.haas.instance.services.input_boolean.turn_on(devices.configuration.vaccum_cleaner_should_run_next_cleaning_automation.entities.main);
       }
     }
   }

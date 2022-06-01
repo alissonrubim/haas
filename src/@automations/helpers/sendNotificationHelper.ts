@@ -1,5 +1,5 @@
-import { App } from "../types/App";
-import { NotificationRequest, AppNotificationRequest, VoiceNotificationRequest, MediaNotificationRequest } from "../types/Notification";
+import { App } from "@haas/app/types/App";
+import { NotificationRequest, AppNotificationRequest, VoiceNotificationRequest, MediaNotificationRequest } from "@haas/app/types/Notification";
 import { broadcastMessage } from "./audio/broadcastMessage";
 
 function getAppEntities(entity: string | string[] | undefined): string[] {

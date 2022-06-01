@@ -28,6 +28,6 @@
     "**/*.ts",
     "**/*.tsx",
     "node_modules/@types/**/*.d.ts",
-    "./types/**/*.d.ts"
+    "../automations/types/**/*.d.ts"
   ]
 }

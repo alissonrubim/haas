@@ -1,6 +1,7 @@
-import { App } from "../../types/App";
+import { App } from "@haas/app/types/App";
 import { sendNotification } from "../../helpers/sendNotificationHelper";
-import { AppSubscription } from "../../types/AppSubscription";
+import { AppSubscription } from "@haas/app/types/AppSubscription";
+import devices from '../../devices';
 
 export default async function register(app: App): Promise<AppSubscription>{
   return {
@@ -8,10 +9,10 @@ export default async function register(app: App): Promise<AppSubscription>{
       bySchedule: {
         cron: {
           hour: {
-            entity: app.devices.configuration.trash_reminder_schedule_time.entities.main,
+            entity: devices.configuration.trash_reminder_schedule_time.entities.main,
           },
           minute: {
-            entity: app.devices.configuration.trash_reminder_schedule_time.entities.main,
+            entity: devices.configuration.trash_reminder_schedule_time.entities.main,
           },
           weekDays: {
             thursday: true
@@ -20,7 +21,7 @@ export default async function register(app: App): Promise<AppSubscription>{
       }
     },
     condition: async () => {
-      const isOnVacation = await app.haas.instance.states.getBoolean(app.devices.configuration.on_vocation.entities.main);
+      const isOnVacation = await app.haas.instance.states.getBoolean(devices.configuration.on_vocation.entities.main);
       return !isOnVacation
     },
     handler: async () => {

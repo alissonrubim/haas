@@ -1,11 +1,12 @@
-import { App } from "../../types/App";
-import { AppSubscription } from "../../types/AppSubscription";
+import { App } from "@haas/app/types/App";
+import { AppSubscription } from "@haas/app/types/AppSubscription";
+import devices from '../../devices';
 
 export default async function register(app: App): Promise<AppSubscription>{
   return {
     subscription: {
       byEntityEvent: {
-        entityId: app.devices.climate.ventilation_system.entities.main
+        entityId: devices.climate.ventilation_system.entities.main
       }
     },
     condition: () => {

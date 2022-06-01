@@ -1,6 +1,7 @@
-import { App } from "../../types/App";
+import { App } from "@haas/app/types/App";
 import { wait } from "../../helpers/untils";
-import { AppSubscription } from "../../types/AppSubscription";
+import { AppSubscription } from "@haas/app/types/appSubscription";
+import devices from '../../devices';
 
 export default async function register(app: App): Promise<AppSubscription>{
   return {
@@ -9,7 +10,7 @@ export default async function register(app: App): Promise<AppSubscription>{
         cron: {
           hour: 11,
           minute: {
-            entity: app.devices.configuration.trash_reminder_schedule_time.entities.main,
+            entity: devices.configuration.trash_reminder_schedule_time.entities.main,
           },
         }
       }, {
@@ -25,11 +26,11 @@ export default async function register(app: App): Promise<AppSubscription>{
       }]
     },
     handler: async () => {
-      await app.haas.instance.services.switch.turn_on(app.devices.climate.ventilation_system.entities.main);
+      await app.haas.instance.services.switch.turn_on(devices.climate.ventilation_system.entities.main);
 
       await wait({ minutes: 15 });
 
-      await app.haas.instance.services.switch.turn_off(app.devices.climate.ventilation_system.entities.main);
+      await app.haas.instance.services.switch.turn_off(devices.climate.ventilation_system.entities.main);
     }
   }
 }

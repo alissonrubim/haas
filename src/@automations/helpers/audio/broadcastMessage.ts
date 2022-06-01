@@ -1,4 +1,4 @@
-import { App } from "../../types/App";
+import { App } from "@haas/app/types/App";
 import { setVolume } from "./setVolume";
 
 export async function broadcastMessage(app: App, entity: string, message: string, volume?: number){
