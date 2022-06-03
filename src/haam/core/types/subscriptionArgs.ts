@@ -1,4 +1,4 @@
-import { HomeAssistantEntityStateResponse } from "../gateways/presentations/homeAssistantEntityState.response";
+import { HomeAssistantEntityState } from "../gateways/presentations";
 
 export interface SubscriptionArgs {
   scheduleArgs?: {
@@ -6,7 +6,7 @@ export interface SubscriptionArgs {
   },
   entityEventArgs?: {
     entityId: string,
-    newState: HomeAssistantEntityStateResponse,
-    oldState: HomeAssistantEntityStateResponse
+    newState: HomeAssistantEntityState,
+    oldState: HomeAssistantEntityState
   }
 }

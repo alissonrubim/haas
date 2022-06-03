@@ -1,6 +1,6 @@
 import createClient, { HassApi } from './websocket/homeAssistantWebSocketClient';
-import { HomeAssistantEntityStateResponse } from './presentations/homeAssistantEntityState.response';
-import { HomeAssistantStateChangeResponse } from './presentations/homeAssistantStateChange.response';
+import { HomeAssistantEntityState, HomeAssistantEntityMessage } from './presentations';
+
 
 export default class HomeAssistantWebSocketGateway {
   #host: string;
@@ -22,17 +22,22 @@ export default class HomeAssistantWebSocketGateway {
     });
   }
 
-  public async getStates(): Promise<HomeAssistantEntityStateResponse[] | undefined> {
-    return await this.#currentConnection?.getStates();
+  public async getStates(): Promise<HomeAssistantEntityState[] | undefined> {
+    return (await this.#currentConnection?.getStates())?.result as any[];
   }
 
   public async callService(domain: string, service: string, data?: any) {
-    return await this.#currentConnection?.callService(domain, service, data)
+    return (await this.#currentConnection?.callService(domain, service, data))?.result as any
   }
 
-  public handleStateChange(handler: (evt: HomeAssistantStateChangeResponse) => void) {
-    this.#currentConnection?.on("state_changed", (evt) => {
-      handler(evt as HomeAssistantStateChangeResponse)
+  public onMessage(handler: (evt: HomeAssistantEntityMessage) => void) {
+    this.#currentConnection?.on("message", (evt) => {
+      handler(evt as HomeAssistantEntityMessage)
     })
+  }
+  
+  public async subscribeToTrigger(trigger: {}): Promise<number>{
+    const subscription = await this.#currentConnection?.subscribeToTrigger(trigger);
+    return Promise.resolve(subscription!.id)
   }
 }

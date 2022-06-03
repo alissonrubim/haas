@@ -1,4 +1,4 @@
-export interface HomeAssistantEntityStateResponse {
+export interface HomeAssistantEntityState {
   entity_id: string,
   state: string,
   attributes: any,

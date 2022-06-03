@@ -34,6 +34,7 @@ type HassCommandArgs = {
     | 'get_services'
     | 'get_panels'
     | 'get_config'
+    | 'subscribe_trigger'
     | 'media_player_thumbnail'
     | 'camera_thumbnail';
 
@@ -42,16 +43,25 @@ type HassCommandArgs = {
 
 export type EventListener = (...args: any[]) => void;
 export type EventType = string | symbol;
+export type ResultType = {
+  id: number,
+  result: any | any[]
+}
+export type MediaType = {
+  content_type: string,
+  content: Buffer,
+}
 
 export type HassApi = {
   rawClient: HassClient;
-  getStates: () => Promise<any[]>;
-  getServices: () => Promise<any[]>;
-  getPanels: () => Promise<any[]>;
-  getConfig: () => Promise<{}>;
+  getStates: () => Promise<ResultType>;
+  getServices: () => Promise<ResultType>;
+  getPanels: () => Promise<ResultType>;
+  getConfig: () => Promise<ResultType>;
+  subscribeToTrigger: (trigger: {}) => Promise<ResultType>;
 
-  getMediaPlayerThumbnail: (entityId: string) => Promise<{}>;
-  getCameraThumbnail: (entityId: string) => Promise<{}>;
+  getMediaPlayerThumbnail: (entityId: string) => Promise<MediaType>;
+  getCameraThumbnail: (entityId: string) => Promise<MediaType>;
 
   on: (eventType: EventType, cb: EventListener) => void;
 
@@ -83,12 +93,15 @@ const defaultOptions: Partial<HassWsOptions> = {
 const command = async (
   commandArgs: HassCommandArgs,
   client: HassClient
-): Promise<any> => {
+): Promise<ResultType> => {
   return new Promise((resolve, reject) => {
     const id = client.seq;
 
     client.resultMap[id] = (resultMessage: any) => {
-      if (resultMessage.success) resolve(resultMessage.result);
+      if (resultMessage.success) resolve({
+        id: resultMessage.id,
+        result: resultMessage.result
+      });
       else reject(new Error(resultMessage.error.message));
 
       // We won't need this callback again once we use it:
@@ -147,10 +160,18 @@ const clientObject = (client: HassClient): HassApi => {
     getServices: async () => command({ type: 'get_services' }, client),
     getPanels: async () => command({ type: 'get_panels' }, client),
     getConfig: async () => command({ type: 'get_config' }, client),
+    subscribeToTrigger: async (trigger = {}) => 
+      command({ 
+        type: 'subscribe_trigger',
+        trigger: trigger
+      }, client),
+    
 
     on: (eventId: EventType, cb: EventListener): void => {
       client.emitter.on(eventId as string, cb);
     },
+
+    
 
     async callService(domain, service, additionalArgs = {}) {
       return command(
@@ -171,7 +192,7 @@ const clientObject = (client: HassClient): HassApi => {
           entity_id: entityId,
         },
         client
-      ).then(binaryResultTransform);
+      ).then((x) => binaryResultTransform(x.result));
     },
 
     async getCameraThumbnail(entityId) {
@@ -181,7 +202,7 @@ const clientObject = (client: HassClient): HassApi => {
           entity_id: entityId,
         },
         client
-      ).then(binaryResultTransform);
+      ).then((x) => binaryResultTransform(x.result));
     },
   };
 };

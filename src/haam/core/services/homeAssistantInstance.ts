@@ -1,13 +1,16 @@
 import HomeAssistantWebSocketGateway from '../gateways/homeAssistantWebSocketGateway';
-import { HomeAssistantEntityStateResponse } from '../gateways/presentations/homeAssistantEntityState.response';
-import { HomeAssistantStateChangeResponse } from '../gateways/presentations/homeAssistantStateChange.response';
-import { HomeAssistantInstancePublic } from './homeAssistantInstancePublic'
+import { HomeAssistantEntityState, HomeAssistantStateChangeMessage, HomeAssistantEntityMessage, HomeAssistantTriggerMessage } from '../gateways/presentations';
+import { HomeAssistantInstancePublic } from './homeAssistantInstancePublic';
 
 interface EventSubscription {
   id: string,
   entityId: string,
-  handler: (entityId: string, newState: HomeAssistantEntityStateResponse, oldState: HomeAssistantEntityStateResponse) => Promise<void>
+  handler: (entityId: string, newState: HomeAssistantEntityState, oldState: HomeAssistantEntityState) => Promise<void>
 }
+
+// interface TriggerSubscription {
+//   id: string
+// }
 
 export class HomeAssistantInstance {
   #gateway: HomeAssistantWebSocketGateway;
@@ -18,18 +21,28 @@ export class HomeAssistantInstance {
   }
 
   // When a event is fired, it will search the subscriptions that match the entity
-  #handleStateChange(evt: HomeAssistantStateChangeResponse){
+  #handleStateChangeEvent(evt: HomeAssistantStateChangeMessage){
     this.#registeredEventSubscriptions.filter((x) => x.entityId === evt.data.entity_id).forEach(async (x) => {
       await x.handler(x.entityId, evt.data.new_state, evt.data.old_state)
     })
   }
 
+  #handleTriggerEvent(evt: HomeAssistantTriggerMessage){
+    console.info(evt)
+  }
+
   public async connect(){
     await this.#gateway.connect();
 
-    // This will handle all events and it will foward to the respective subscription
-    this.#gateway.handleStateChange((evt: HomeAssistantStateChangeResponse) => {
-      this.#handleStateChange(evt)
+    this.#gateway.onMessage((evt: HomeAssistantEntityMessage) => {
+      if(evt.type == "event"){
+        if(evt.event && evt.event.event_type === "state_changed"){
+          this.#handleStateChangeEvent(evt.event as HomeAssistantStateChangeMessage)
+        }
+        else if(evt.event.variables && evt.event.variables.trigger){
+          this.#handleTriggerEvent(evt.event as HomeAssistantTriggerMessage)
+        }
+      }
     })
   }
 
@@ -55,12 +68,16 @@ export class HomeAssistantInstance {
     return new HomeAssistantInstancePublic(this)
   }
 
-  public async getEntity(entityId: string): Promise<HomeAssistantEntityStateResponse | undefined>{
+  public async getEntity(entityId: string): Promise<HomeAssistantEntityState| undefined>{
     const states = await this.#gateway.getStates();
     return Promise.resolve(states?.find((x) => x.entity_id === entityId))
   }
 
   public async callService(domain: string, service: string, data?: any) {
     return await this.#gateway.callService(domain, service, data)
+  }
+
+  public async subscribeToTrigger(trigger: {}, handler: () => void){
+    return await this.#gateway.subscribeToTrigger(trigger); 
   }
 }

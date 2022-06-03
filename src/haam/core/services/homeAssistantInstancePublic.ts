@@ -1,4 +1,4 @@
-import { HomeAssistantEntityStateResponse }  from '../gateways/presentations/homeAssistantEntityState.response';
+import { HomeAssistantEntityState }  from '../gateways/presentations';
 import { HomeAssistantInstancePublicServices } from './homeAssistantInstancePublic.services';
 import { HomeAssistantInstancePublicStates } from './homeAssistantInstancePublic.states';
 import { HomeAssistantInstance } from './homeAssistantInstance';
@@ -15,7 +15,7 @@ export class HomeAssistantInstancePublic {
     this.services = new HomeAssistantInstancePublicServices(instance);
   }
 
-  public async getEntity(entityId: string): Promise<HomeAssistantEntityStateResponse | undefined>{
+  public async getEntity(entityId: string): Promise<HomeAssistantEntityState | undefined>{
     return this.#instance.getEntity(entityId)
   }
 }

@@ -33,8 +33,8 @@ export class HaamCore {
   #homeAssistantInstance: HomeAssistantInstance;
   instance: HomeAssistantInstancePublic;
 
-  // This triggers the subscription handler
-  async #triggerSubscription(sub: Subscription, args: SubscriptionArgs){
+  // Fire the subscription handler
+  async #fireSubscription(sub: Subscription, args: SubscriptionArgs){
     try{
       if(sub.condition ? await sub.condition(args) : true){
         console.info(new Date(), `[${sub.id}-${sub.name}]: Subscription handler trigged.`)
@@ -53,7 +53,7 @@ export class HaamCore {
           scheduleArgs: {}
         };
 
-        await this.#triggerSubscription(sub, args)
+        await this.#fireSubscription(sub, args)
       });
     }
 
@@ -91,27 +91,27 @@ export class HaamCore {
             if(!schedule.cron?.[property])
               return "*";  
 
-            if(typeof conProperty === 'object'){
-              const dateTimeEntity = conProperty as DateTimeEntity;
-              const date = await this.instance.states.getDateTime(dateTimeEntity.entity, "HH:mm:ss");
+            // if(typeof conProperty === 'object'){
+            //   const dateTimeEntity = conProperty as DateTimeEntity;
+            //   const date = await this.instance.states.getDateTime(dateTimeEntity.entity, "HH:mm:ss");
 
-              // const registeredSub = this.#subscriptions.find((x) => x.id === sub.id);
-              // if(!registeredSub?._eventsControll.eventSubscription?.find((x) => x.entityId == dateTimeEntity.entity)){
-              //   const subscriptionEventId = this.#homeAssistantInstance.subscribeToStateChange(dateTimeEntity.entity, async (entityId, newState, oldState) => {
-              //     this.unsubscribe(sub.id);
-              //     this.subscribe(sub);
-              //     await this.process(sub);
-              //     console.info(this.#subscriptions.find((x) => x.id === sub.id)?._eventsControll.scheduleSubscriptions)
-              //   });
+            //   // const registeredSub = this.#subscriptions.find((x) => x.id === sub.id);
+            //   // if(!registeredSub?._eventsControll.eventSubscription?.find((x) => x.entityId == dateTimeEntity.entity)){
+            //   //   const subscriptionEventId = this.#homeAssistantInstance.subscribeToStateChange(dateTimeEntity.entity, async (entityId, newState, oldState) => {
+            //   //     this.unsubscribe(sub.id);
+            //   //     this.subscribe(sub);
+            //   //     await this.process(sub);
+            //   //     console.info(this.#subscriptions.find((x) => x.id === sub.id)?._eventsControll.scheduleSubscriptions)
+            //   //   });
 
-              //   registeredSub?._eventsControll.eventSubscription?.push({
-              //     entityId: dateTimeEntity.entity,
-              //     subscriptionEventId
-              //   })
-              // }
+            //   //   registeredSub?._eventsControll.eventSubscription?.push({
+            //   //     entityId: dateTimeEntity.entity,
+            //   //     subscriptionEventId
+            //   //   })
+            //   // }
 
-              return returnPieceFromDate(date, dateTimeEntity.piece ?? property);
-            }
+            //   return returnPieceFromDate(date, dateTimeEntity.piece ?? property);
+            // }
   
             return conProperty as string;
           }
@@ -169,7 +169,7 @@ export class HaamCore {
         }
       }
 
-      await this.#triggerSubscription(sub, args)
+      await this.#fireSubscription(sub, args)
     });
 
     return {
@@ -243,10 +243,10 @@ export class HaamCore {
   }
 
   // Run a subscription base on the subscriptionId
-  public triggerSubscriptionById(id: string){
+  public fireSubscriptionById(id: string){
     const registeredSubscription = this.#subscriptions.find((x) => x.id === id && x._isProcessed); 
     if(registeredSubscription)
-      this.#triggerSubscription(registeredSubscription, {})
+      this.#fireSubscription(registeredSubscription, {})
     else
       throw new Error(`Subscription ${id} not found!`);
   }
@@ -263,5 +263,12 @@ export class HaamCore {
     console.info(`${this.#subscriptions.filter((x) => x._isProcessed === true).length} subscriptions registered successfully!`);
 
     console.info("\n\nHaas successfully started at", new Date(), "\n\n")
+
+    // this.#homeAssistantInstance.subscribeToTrigger({
+    //   platform: "time",
+    //   at: "input_datetime.trash_reminder_schedule_time"
+    // }, () => {
+    //   console.info("opa")
+    // })
   }
 }

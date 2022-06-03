@@ -1,3 +1,3 @@
-export * from './App'
-export * from  './AppSubscription'
-export * from  './Notification'
+export * from './app'
+export * from  './appSubscription'
+export * from  './notification'
