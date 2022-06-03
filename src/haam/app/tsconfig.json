@@ -1,6 +1,7 @@
 {
   "display": "Default",
   "compilerOptions": {
+    "module": "ES2022",
     "target": "es2021",
     "checkJs": false,
     "composite": false,
