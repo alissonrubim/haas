@@ -9,4 +9,5 @@ export interface SubscriptionArgs {
     newState: HomeAssistantEntityState,
     oldState: HomeAssistantEntityState
   }
+  triggerEventArgs?: any
 }

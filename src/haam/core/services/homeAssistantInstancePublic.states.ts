@@ -21,4 +21,11 @@ export class HomeAssistantInstancePublicStates {
       Promise.resolve(undefined)    
     return Promise.resolve(moment(entity?.state, format).toDate())
   }
+
+  public async getString(entityId: string): Promise<string | undefined>{
+    const entity = await this.#instance.getEntity(entityId);
+    if(!entity)
+      Promise.resolve(undefined)
+    return Promise.resolve(entity?.state as string)
+  }
 }

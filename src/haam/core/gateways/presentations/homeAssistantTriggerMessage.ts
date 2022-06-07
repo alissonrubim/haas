@@ -1,7 +1,5 @@
-import { HomeAssistantEntityState } from "./homeAssistantEntityState"
+import { HomeAssistantMessage } from "./homeAssistantMessage";
 
-export interface HomeAssistantTriggerMessage {
-  entity_id: string,
-  from_state: HomeAssistantEntityState,
-  to_state: HomeAssistantEntityState,
+export interface HomeAssistantTriggerMessage extends HomeAssistantMessage {
+
 }

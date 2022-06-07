@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { HaamCore } from '@haam/core';
-import { AppSubscription } from './types';
+import { Haam } from '@haam/core';
+import { AppContext, AppSubscription } from './types';
 
 export interface HassAppConfig {
   host: string,
@@ -18,7 +18,7 @@ export class HassApp {
   }
 
   public async start(){
-    const haamCore = new HaamCore(this.#config.host, this.#config.port, this.#config.token);
+    const haam = new Haam(this.#config.host, this.#config.port, this.#config.token);
 
     const files: string[] = [];
     const getFilesRecursively = (directory: string) => {
@@ -37,21 +37,22 @@ export class HassApp {
     //Run each script
     files.forEach(async (file) => {
       const id = path.basename(file).split('_')[0];
-
+      
       const fileImport = await import(`${file}`);
-      const subscription = await fileImport.default({
-        haamCore
-      }) as AppSubscription;
+      const subscriptions = await fileImport.default(haam.instance as AppContext) as AppSubscription[];
 
-      haamCore.subscribe({
-        id: id,
-        name: path.basename(file),
-        config: subscription.subscription,
-        handler: subscription.handler,
-        condition: subscription.condition
+      subscriptions.forEach((subscription, subscriptionIndex) => {
+        haam.subscribe({
+          id: `${id}_${subscriptionIndex}`,
+          enabled: subscription.enabled === false ? false : true,
+          name: path.basename(file),
+          config: subscription.subscription,
+          handler: subscription.handler,
+          condition: subscription.condition
+        })
       })
     })
 
-    await haamCore.start();
+    await haam.start();
   }
 }

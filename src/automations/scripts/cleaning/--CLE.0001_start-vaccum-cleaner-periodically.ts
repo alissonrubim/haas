@@ -1,10 +1,10 @@
-import { App, AppSubscription } from "@haam/app/types";
-import { wait } from "../../helpers/utils";
+import { AppContext, AppSubscription } from "@haam/app/types";
 import { sendNotification } from "../../helpers/sendNotificationHelper";
 import devices from '../../devices';
 
-export default async function register(app: App): Promise<AppSubscription> {
-  return {
+export default async function register(context: AppContext): Promise<AppSubscription[]> {
+  return[];
+  return [{
     subscription: {
       bySchedule: {
         cron: {
@@ -19,18 +19,18 @@ export default async function register(app: App): Promise<AppSubscription> {
       }
     },
     condition: async () => {
-      const isOnVacation = await app.core.instance.states.getBoolean(devices.configuration.on_vocation.entities.main);
+      const isOnVacation = await context.states.getBoolean(devices.configuration.on_vocation.entities.main);
       return !isOnVacation
     },
     handler: async () => {
-      const vaccumCleanerEntity = await app.core.instance.getEntity(devices.cleaning.vaccum_cleaner.entities.main);
+      const vaccumCleanerEntity = await context.getEntity(devices.cleaning.vaccum_cleaner.entities.main);
       const hasError = vaccumCleanerEntity?.state === "error"
       const hasBaterry = vaccumCleanerEntity?.attributes.baterry_level > 75;
 
       if(hasError || hasBaterry)
         return;
 
-      await sendNotification(app, {
+      await sendNotification(context, {
         app: {
           title: "Vaccumm Cleaner will start in 5 minutes",
           message: "Vaccumm Cleaner will start in 5 minutes, do not forget to make space for it!",
@@ -45,14 +45,14 @@ export default async function register(app: App): Promise<AppSubscription> {
         }
       });
     
-      await wait({ seconds: 20, minutes: 1 });
+      await context.wait({ seconds: 20, minutes: 1 });
 
-      const shoudlStartCleaning = await app.core.instance.states.getBoolean(devices.configuration.vaccum_cleaner_should_run_next_cleaning_automation.entities.main);
+      const shoudlStartCleaning = await context.states.getBoolean(devices.configuration.vaccum_cleaner_should_run_next_cleaning_automation.entities.main);
       if(shoudlStartCleaning){
-        await app.core.instance.services.vaccum.start(devices.cleaning.vaccum_cleaner.entities.main)
+        await context.services.vaccum.start(devices.cleaning.vaccum_cleaner.entities.main)
       }else{
-        await app.core.instance.services.input_boolean.turn_on(devices.configuration.vaccum_cleaner_should_run_next_cleaning_automation.entities.main);
+        await context.services.input_boolean.turn_on(devices.configuration.vaccum_cleaner_should_run_next_cleaning_automation.entities.main);
       }
     }
-  }
+  }]
 }

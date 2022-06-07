@@ -1,1 +1,1 @@
-export * from './haamCore'
+export * from './haam/haam'

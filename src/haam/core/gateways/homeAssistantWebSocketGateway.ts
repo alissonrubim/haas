@@ -1,5 +1,5 @@
 import createClient, { HassApi } from './websocket/homeAssistantWebSocketClient';
-import { HomeAssistantEntityState, HomeAssistantEntityMessage } from './presentations';
+import { HomeAssistantEntityState, HomeAssistantMessage } from './presentations';
 
 
 export default class HomeAssistantWebSocketGateway {
@@ -30,14 +30,14 @@ export default class HomeAssistantWebSocketGateway {
     return (await this.#currentConnection?.callService(domain, service, data))?.result as any
   }
 
-  public onMessage(handler: (evt: HomeAssistantEntityMessage) => void) {
+  public onMessage(handler: (evt: HomeAssistantMessage) => void) {
     this.#currentConnection?.on("message", (evt) => {
-      handler(evt as HomeAssistantEntityMessage)
+      handler(evt as HomeAssistantMessage)
     })
   }
   
-  public async subscribeToTrigger(trigger: {}): Promise<number>{
+  public async subscribeToTrigger(trigger: any): Promise<string>{
     const subscription = await this.#currentConnection?.subscribeToTrigger(trigger);
-    return Promise.resolve(subscription!.id)
+    return Promise.resolve(subscription!.id as unknown as string)
   }
 }

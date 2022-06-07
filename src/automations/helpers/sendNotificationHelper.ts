@@ -1,4 +1,4 @@
-import { App,  NotificationRequest, AppNotificationRequest, VoiceNotificationRequest, MediaNotificationRequest } from "@haam/app/types";
+import { AppContext,  NotificationRequest, AppNotificationRequest, VoiceNotificationRequest, MediaNotificationRequest } from "@haam/app/types";
 import { broadcastMessage } from "./audio/broadcastMessage";
 
 function getAppEntities(entity: string | string[] | undefined): string[] {
@@ -36,10 +36,10 @@ function getMediaEntities(entity: string | string[] | undefined): string[]{
   return entity as string[]
 }
 
-export async function sendNotification(app: App, notification: NotificationRequest){
+export async function sendNotification(context: AppContext, notification: NotificationRequest){
   async function sendViaApp(notificationApp: AppNotificationRequest){
     getAppEntities(notificationApp?.entity).forEach(async (entity) => {
-      await app.core.instance.services.notify(entity, { 
+      await context.services.notify(entity, { 
         "title": notificationApp?.title,
         "message": notificationApp?.message,
         "data": {
@@ -51,7 +51,7 @@ export async function sendNotification(app: App, notification: NotificationReque
 
   async function sendViaVoice(notificationVoice: VoiceNotificationRequest){
     getMediaEntities(notificationVoice.entity).forEach(async (entity) => {
-      await broadcastMessage(app, entity, notificationVoice.message, notificationVoice.volume)
+      await broadcastMessage(context, entity, notificationVoice.message, notificationVoice.volume)
     })
   }
 

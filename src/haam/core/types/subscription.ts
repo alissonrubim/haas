@@ -2,6 +2,7 @@ import { SubscriptionArgs } from './subscriptionArgs';
 import { SubscriptionConfig } from './subscriptionConfig';
 
 export interface Subscription {
+  enabled: boolean,
   id: string,
   name: string,
   config: SubscriptionConfig,

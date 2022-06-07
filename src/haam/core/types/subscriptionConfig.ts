@@ -1,3 +1,5 @@
+import { TriggerConfig } from "../haam/byTrigger/processSubscriptionsByTrigger"
+
 export interface DateTimeEntity {
   entity: string,
   piece?: "year" | "month" | "day" | "hour" | "minute" | "second"
@@ -38,9 +40,9 @@ export interface ByScheduleConfig {
   expression?: string,
 }
 
-
 export interface SubscriptionConfig {
-  bySchedule?: ByScheduleConfig | ByScheduleConfig[],
+  bySchedule?: ByScheduleConfig | Array<ByScheduleConfig>,
+  byTrigger?: TriggerConfig | Array<TriggerConfig>
   byEntityEvent?: {
     entityId: string,
   }
