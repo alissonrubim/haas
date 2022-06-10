@@ -1,5 +1,5 @@
 import { AppContext, AppSubscription } from "@haam/app/types";
-import devices from '../../devices';
+import devices from '../devices';
 
 export default async function register(context: AppContext): Promise<AppSubscription[]>{
   return [{
@@ -10,6 +10,9 @@ export default async function register(context: AppContext): Promise<AppSubscrip
         platform: "state",
         entityId: devices.living_room.switch_controlls.controll_1.entities.main
       }
+    },
+    condition: async (evt) => {
+      return evt.triggerEventArgs.to_state.state !== ""
     },
     handler: async (evt) => {
       const state_actions: {[key: string]: () => Promise<void>} = {

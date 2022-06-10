@@ -1,11 +1,12 @@
 
 import { AppContext, AppSubscription } from "@haam/app/types";
 import { Console } from "console";
-import devices from '../../devices';
+import devices from '../devices';
 
 export default async function register(context: AppContext): Promise<AppSubscription[]>{
   let isRunning = false;
   return [{
+    enabled: false,
     subscription: {
       byTrigger: {
         platform: "mqtt",

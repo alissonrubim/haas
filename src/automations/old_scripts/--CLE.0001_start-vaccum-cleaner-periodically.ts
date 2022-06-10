@@ -1,6 +1,6 @@
 import { AppContext, AppSubscription } from "@haam/app/types";
-import { sendNotification } from "../../helpers/sendNotificationHelper";
-import devices from '../../devices';
+import { sendNotification } from "../helpers/sendNotificationHelper";
+import devices from '../devices';
 
 export default async function register(context: AppContext): Promise<AppSubscription[]> {
   return[];

@@ -1,6 +1,6 @@
 import { AppContext, AppSubscription } from "@haam/app/types";
-import devices from '../../devices';
-import { sendNotification } from "../../helpers/sendNotificationHelper";
+import devices from '../../../devices';
+import { sendNotification } from "../../../helpers/sendNotificationHelper";
 
 export default async function register(context: AppContext): Promise<AppSubscription[]>{
   return [{
@@ -15,9 +15,8 @@ export default async function register(context: AppContext): Promise<AppSubscrip
       }]
     },
     condition: async () => {
-      ///FIX ME: This should only rely on a boolean for the alarm system
-      const isOnVacation = devices.home.modes.vacation.states.is_on(context);
-      const alarmSystemIsOn = new Date().getHours() < 6 //between 0 and 6
+      const isOnVacation = await devices.home.modes.vacation.states.is_on(context);
+      const alarmSystemIsOn = await devices.home.configuration.alarm_system.states.is_on(context);
       return isOnVacation || alarmSystemIsOn;
     },
     handler: async () => {

@@ -26,8 +26,12 @@ export default {
           main: "input_boolean.on_vacation",
         },
         states: {
-          is_on: async (context: AppContext) => await context.states.getBoolean("switch.ventilation_system") === true,
-          is_off: async (context: AppContext) => await context.states.getBoolean("switch.ventilation_system") === false,
+          is_on: async (context: AppContext) => await context.states.getBoolean("input_boolean.on_vacation") === true,
+          is_off: async (context: AppContext) => await context.states.getBoolean("input_boolean.on_vacation") === false,
+        },
+        actions: {
+          turn_on: async (context: AppContext) => await context.services.input_boolean.turn_on("input_boolean.on_vacation"),
+          turn_off: async (context: AppContext) => await context.services.input_boolean.turn_off("input_boolean.on_vacation"),
         }
       }
     },
@@ -42,9 +46,10 @@ export default {
       },
       weather: {
         entities: {
-          main: "weather.home"
-        }
-      }
+          main: "weather.home",
+          forecast: "weather.buienradar"
+        },
+      },
     },
     configuration: {
       trash_day_type: {
@@ -57,10 +62,44 @@ export default {
         actions: {
           set_value: async (context: AppContext, option: string) => await context.services.input_select.select_option("input_select.trash_day_type", option),
         }
+      },
+      alarm_system: {
+        entities: {
+          main: "input_boolean.alarm_system",
+        },
+        actions: {
+          turn_on: async (context: AppContext) => await context.services.input_boolean.turn_on("input_boolean.alarm_system"),
+          turn_off: async (context: AppContext) => await context.services.input_boolean.turn_off("input_boolean.alarm_system"),
+        },
+        states: {
+          is_on: async (context: AppContext) => await context.states.getBoolean("input_boolean.alarm_system") === true,
+        }
+      }
+    },
+    controls: {
+      should_turn_off_backyard_lights_automatically: {
+        entities: {
+          main: "input_boolean.control_should_turn_off_backyard_lights_automatically"
+        },
+        states: {
+          is_on: async (context: AppContext) => await context.states.getBoolean("input_boolean.control_should_turn_off_backyard_lights_automatically") === true,
+          is_off: async (context: AppContext) => await context.states.getBoolean("input_boolean.control_should_turn_off_backyard_lights_automatically") === false,
+        },
+        actions: {
+          turn_on: async (context: AppContext) => await context.services.input_boolean.turn_on("input_boolean.control_should_turn_off_backyard_lights_automatically"),
+          turn_off: async (context: AppContext) => await context.services.input_boolean.turn_off("input_boolean.control_should_turn_off_backyard_lights_automatically"),
+        }
       }
     }
   },
   bathroom: {
+    speakers: {
+      google_mini: {
+        entities: {
+          main: "media_player.bathroom_speaker"
+        }
+      }
+    },
     sensors: {
       temperature_and_humidity: {
         entities: {
@@ -85,6 +124,13 @@ export default {
     }
   },
   living_room: {
+    speakers: {
+      google_display: {
+        entities: {
+          main: "media_player.living_room_display"
+        }
+      }
+    },
     lights: {
       lamp: {
         entities: {
@@ -188,39 +234,13 @@ export default {
       }
     }
   },
-
-
-  configuration: {
-    vaccum_cleaner_should_run_next_cleaning_automation: {
-      entities: {
-        main: "input_boolean.vaccum_cleaner_should_run_next_cleaning_automation"
+  alissons_office: {
+    speakers: {
+      google_mini: {
+        entities: {
+          main: "media_player.alissons_office_speaker"
+        }
       }
     },
-    on_vocation: {
-      entities: {
-        main: "input_boolean.on_vacation"
-      }
-    }
-  },
-  climate: {
-    ventilation_system: {
-      entities: {
-        main: "switch.ventilation_system"
-      }
-    }
-  },
-  cleaning: {
-    vaccum_cleaner: {
-      entities: {
-        main: "vacuum.neato"
-      }
-    }
-  },
-  lighs: {
-    alissons_office_light_strip: {
-      entities: {
-        main: "light.alissons_office_light_strip"
-      }
-    }
-  },
+  }
 }

@@ -1,8 +1,8 @@
 import { AppContext, AppSubscription } from "@haam/app/types";
-import devices from '../../devices';
+import devices from '../devices';
 
 export default async function register(context: AppContext): Promise<AppSubscription[]>{
-  const humidyLevelThreshold = 65
+  const humidyLevelThreshold = 75
 
   return [{
     enabled: true,

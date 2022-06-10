@@ -1,9 +1,9 @@
 import { AppContext, AppSubscription } from "@haam/app/types";
-import devices from '../../devices';
+import devices from '../devices';
 
 export default async function register(context: AppContext): Promise<AppSubscription[]>{
   return [{
-    enabled: true,
+    enabled: false,
     description: "Turn on ventitilation periodically",
     subscription: {
       byTrigger: [{

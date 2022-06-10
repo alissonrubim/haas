@@ -1,9 +1,7 @@
 import { AppContext, AppSubscription } from "@haam/app/types";
-import devices from '../../devices';
+import devices from '../devices';
 
 export default async function register(context: AppContext): Promise<AppSubscription[]>{
-  let shouldTurnOffAutomatically = false;
-
   return [{
     enabled: true,
     description: "Turn on backyard lights when the backdoor opens",
@@ -20,7 +18,7 @@ export default async function register(context: AppContext): Promise<AppSubscrip
     },
     handler: async () => {
       await devices.backyard.lights.all.actions.turn_on(context),
-      shouldTurnOffAutomatically = true;
+      await devices.home.controls.should_turn_off_backyard_lights_automatically.actions.turn_on(context);
     }
   }
   , 
@@ -37,12 +35,13 @@ export default async function register(context: AppContext): Promise<AppSubscrip
     },
     condition: async () => {
       const lightsAreOn = await devices.backyard.lights.pole.states.is_on(context) || await devices.backyard.lights.table.states.is_on(context)
+      const shouldTurnOffAutomatically = await devices.home.controls.should_turn_off_backyard_lights_automatically.states.is_on(context);
       return shouldTurnOffAutomatically && lightsAreOn && await devices.home.world.sun.states.is_bellow_horizon(context);
     },
     handler: async () => {
       await context.wait({ seconds: 30 })
       await devices.backyard.lights.all.states.is_off(context)
-      shouldTurnOffAutomatically = false;
+      await devices.home.controls.should_turn_off_backyard_lights_automatically.actions.turn_off(context);
     }
   }]
 }

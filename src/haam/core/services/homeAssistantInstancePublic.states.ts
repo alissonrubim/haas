@@ -12,6 +12,7 @@ export class HomeAssistantInstancePublicStates {
     const entity = await this.#instance.getEntity(entityId);
     if(!entity)
       Promise.resolve(undefined)
+    console.info(entity?.entity_id, entity?.state)
     return Promise.resolve(entity?.state === "on" || entity?.state === "true" || entity?.state === "no")
   }
 

@@ -25,7 +25,8 @@ export class HomeAssistantInstancePublicServices {
     start: async (entityId: string) => await this.#instance.callService("vaccum", "start", { entity_id: entityId }),
   }
   input_boolean =  {
-    turn_on: async (entityId: string) => await this.#instance.callService("input_boolean", "turn_on", { entity_id: entityId })
+    turn_on: async (entityId: string) => await this.#instance.callService("input_boolean", "turn_on", { entity_id: entityId }),
+    turn_off: async (entityId: string) => await this.#instance.callService("input_boolean", "turn_off", { entity_id: entityId })
   }
   media_player = {
     set_volume: async (entityId: string, volume: number) => await this.#instance.callService("media_player", "volume_set", { entity_id: entityId, volume_level: `${volume}` }),
