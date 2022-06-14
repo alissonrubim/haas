@@ -7,16 +7,14 @@ export default async function register(context: AppContext): Promise<AppSubscrip
   return [{
     enabled: true,
     description: "When on_vacation is true, turn on alarm system",
-    subscription: {
-      byTrigger: [{
-        platform: "event",
-        eventType: "mobile_app_notification_action",
-        eventData: {
-          action: DisableAlarmSystemAction
-        }
-      }]
-    },
-    handler: async () => {
+    trigger: [{
+      platform: "event",
+      eventType: "mobile_app_notification_action",
+      eventData: {
+        action: DisableAlarmSystemAction
+      }
+    }],
+    action: async () => {
       await devices.home.configuration.alarm_system.actions.turn_off(context)
       await sendNotification(context,  {
         app: { 

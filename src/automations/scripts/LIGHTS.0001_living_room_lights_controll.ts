@@ -5,16 +5,14 @@ export default async function register(context: AppContext): Promise<AppSubscrip
   return [{
     enabled: true,
     description: "Setup each action for the living room switch controll 01",
-    subscription: {
-      byTrigger: {
-        platform: "state",
-        entityId: devices.living_room.switch_controlls.controll_1.entities.main
-      }
+    trigger: {
+      platform: "state",
+      entityId: devices.living_room.switch_controlls.controll_1.entities.main
     },
     condition: async (evt) => {
       return evt.triggerEventArgs.to_state.state !== ""
     },
-    handler: async (evt) => {
+    action: async (evt) => {
       const state_actions: {[key: string]: () => Promise<void>} = {
         single_left: async () => { await devices.living_room.lights.lamp.actions.toggle(context) },
         double_left: async () => {},

@@ -47,8 +47,8 @@ export class HassApp {
             id: `${id}_${subscriptionIndex}`,
             enabled: subscription.enabled === false ? false : true,
             name: path.basename(file),
-            config: subscription.subscription,
-            handler: subscription.handler,
+            trigger: subscription.trigger,
+            action: subscription.action,
             condition: subscription.condition
           })
         })

@@ -1,11 +1,11 @@
 import { SubscriptionArgs } from './subscriptionArgs';
-import { SubscriptionConfig } from './subscriptionConfig';
+import { TriggerConfig } from "../haam/byTrigger/processSubscriptionsByTrigger"
 
 export interface Subscription {
   enabled: boolean,
   id: string,
   name: string,
-  config: SubscriptionConfig,
+  trigger: TriggerConfig | Array<TriggerConfig>,
   condition?: (args: SubscriptionArgs) => Promise<boolean> | boolean,
-  handler: (args: SubscriptionArgs) => Promise<void>
+  action: (args: SubscriptionArgs) => Promise<void>
 }

@@ -18,14 +18,12 @@ export default async function register(context: AppContext): Promise<AppSubscrip
   return [{
     enabled: true,
     description: "Send a notification when someone is breaking in the house",
-    subscription: {
-      byTrigger: SecuritySensors.map((x) => generateTrigger(x))
-    },
+    trigger: SecuritySensors.map((x) => generateTrigger(x)),
     condition: async (evt) => {
       const alarmSystemIsOn = await devices.home.configuration.alarm_system.states.is_on(context);
       return alarmSystemIsOn;
     },
-    handler: async (evt) => {
+    action: async (evt) => {
       //Warn about with sensor is being violated
       await sendNotification(context, {
         app: {

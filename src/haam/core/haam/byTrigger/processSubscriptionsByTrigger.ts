@@ -41,7 +41,7 @@ export async function processSubscriptionsByTrigger(
   hai: HomeAssistantInstance, 
   sub: Subscription, 
   fireSubscriptionHandler: (sub: Subscription, args: SubscriptionArgs) => Promise<void>): Promise<string[]> {
-  const triggers = Array.isArray(sub.config.byTrigger) ? sub.config.byTrigger : [sub.config.byTrigger];
+  const triggers = Array.isArray(sub.trigger) ? sub.trigger : [sub.trigger];
 
   const getTriggerScope = (config: TriggerConfig): any => {
     return resolvers[config.platform](config as any)

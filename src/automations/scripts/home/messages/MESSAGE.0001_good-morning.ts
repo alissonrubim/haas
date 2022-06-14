@@ -6,20 +6,18 @@ export default async function register(context: AppContext): Promise<AppSubscrip
   return [{
     enabled: true,
     description: "Send a good morning message everyday",
-    subscription: {
-      byTrigger: {
-        platform: "time",
-        at: {
-          hour: 8,
-          minute: 45,
-        }
+    trigger: {
+      platform: "time",
+      at: {
+        hour: 8,
+        minute: 45,
       }
     },
     condition: async (evt) => {
       const isOnVacation = await devices.home.modes.vacation.states.is_on(context);
       return !isOnVacation;
     },
-    handler: async (evt) => {
+    action: async (evt) => {
       const weekdays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
       const months = ["January","February","March","April","May","June","July","August","September","October","November","December"]
 

@@ -3,7 +3,7 @@ import { Subscription } from "@haam/core/types";
 export interface AppSubscription {
   enabled?: boolean,
   description?: string,
-  subscription: Subscription["config"],
-  handler: Subscription["handler"],
+  trigger: Subscription["trigger"],
+  action: Subscription["action"],
   condition?: Subscription["condition"];
 }

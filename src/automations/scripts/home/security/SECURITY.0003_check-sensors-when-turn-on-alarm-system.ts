@@ -19,19 +19,17 @@ export default async function register(context: AppContext): Promise<AppSubscrip
   return [{
     enabled: true,
     description: "When the alarm system is turned on, check is all the sensors are closed",
-    subscription: {
-      byTrigger: [{
-        platform: "state",
-        entityId: devices.home.configuration.alarm_system.entities.main,
-        from: 'off',
-        to: 'on'
-      }]
-    },
+    trigger: [{
+      platform: "state",
+      entityId: devices.home.configuration.alarm_system.entities.main,
+      from: 'off',
+      to: 'on'
+    }],
     condition: async () => {
       const openSensors = await getOpenSensors(context);
       return openSensors.length > 0
     },
-    handler: async () => {
+    action: async () => {
       const openSensors = await getOpenSensors(context);
       for(const index in openSensors){
         await sendNotification(context, {

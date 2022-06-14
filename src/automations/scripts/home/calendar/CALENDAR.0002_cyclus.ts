@@ -12,14 +12,12 @@ export default async function register(context: AppContext): Promise<AppSubscrip
   return [{
     enabled: true,
     description: "Base on the Cyclus calender, this script will set the trash type for the day",
-    subscription: {
-      byTrigger: [{
-        platform: "calendar",
-        event: "start",
-        entityId: devices.home.calendars.cyclus.entities.main
-      }]
-    },
-    handler: async (evt) => {
+    trigger: [{
+      platform: "calendar",
+      event: "start",
+      entityId: devices.home.calendars.cyclus.entities.main
+    }],
+    action: async (evt) => {
       const calendarEvent = evt.triggerEventArgs.calendar_event;
       const eventSummary = calendarEvent.summary.toLowerCase();
 

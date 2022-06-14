@@ -28,14 +28,12 @@ export default async function register(context: AppContext): Promise<AppSubscrip
   return [{
     enabled: true,
     description: "Base on the Home calendar, this script will take actions when the event starts",
-    subscription: {
-      byTrigger: [{
-        platform: "calendar",
-        event: "start",
-        entityId: devices.home.calendars.home.entities.main
-      }]
-    },
-    handler: async (evt) => {
+    trigger: [{
+      platform: "calendar",
+      event: "start",
+      entityId: devices.home.calendars.home.entities.main
+    }],
+    action: async (evt) => {
       const calendarEvent = evt.triggerEventArgs.calendar_event;
       const event = events.find((e) => `[${e.event}]` === calendarEvent.summary);
       if(event)
@@ -44,14 +42,12 @@ export default async function register(context: AppContext): Promise<AppSubscrip
   }, {
     enabled: true,
     description: "Base on the Home calendar, this script will take actions when the event ends",
-    subscription: {
-      byTrigger: [{
-        platform: "calendar",
-        event: "end",
-        entityId: devices.home.calendars.home.entities.main
-      }]
-    },
-    handler: async (evt) => {
+    trigger: [{
+      platform: "calendar",
+      event: "end",
+      entityId: devices.home.calendars.home.entities.main
+    }],
+    action: async (evt) => {
       const calendarEvent = evt.triggerEventArgs.calendar_event;
       const event = events.find((e) => `[${e.event}]` === calendarEvent.summary);
       if(event)
