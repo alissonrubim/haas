@@ -12,17 +12,29 @@ import {
   MqttPlatform,
   mqttPlatformResolver,
   TimePatternPlatform,
-  timePatternPlatformResolver
+  timePatternPlatformResolver,
+  EventPlatform,
+  eventPlatformResolver
 } from "./platforms";
 
-export type TriggerConfig = StatePlatform | SunPlatform | TimePlatform | CalendarPlatform | MqttPlatform | TimePatternPlatform
+export type TriggerConfig = 
+  StatePlatform | 
+  SunPlatform | 
+  TimePlatform | 
+  CalendarPlatform | 
+  MqttPlatform | 
+  TimePatternPlatform | 
+  EventPlatform
+
+
 const resolvers = {
   time: timePlatformResolver,
   state: statePlatformResolver,
   sun: sunPlatformResolver,
   calendar: calendarPlatformResolver,
   mqtt: mqttPlatformResolver,
-  time_pattern: timePatternPlatformResolver
+  time_pattern: timePatternPlatformResolver,
+  event: eventPlatformResolver
 }
 
 export async function processSubscriptionsByTrigger(

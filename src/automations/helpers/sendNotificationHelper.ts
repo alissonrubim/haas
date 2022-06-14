@@ -1,9 +1,10 @@
 import { AppContext,  NotificationRequest, AppNotificationRequest, VoiceNotificationRequest, MediaNotificationRequest } from "@haam/app/types";
-import { broadcastMessage } from "./audio/broadcastMessage";
+import devices from "../devices";
+import { broadcastMessage } from "./media/broadcastMessage";
 
 function getAppEntities(entity: string | string[] | undefined): string[] {
-  const alissonAppEntity = "mobile_app_alissons_iphone"
-  const brunaAppEntity = "mobile_app_brunas_iphone"
+  const alissonAppEntity = devices.mobile.alissons_iphone.entities.main
+  const brunaAppEntity = devices.mobile.brunas_iphone.entities.main
 
   if(!entity)
     return [alissonAppEntity, brunaAppEntity];

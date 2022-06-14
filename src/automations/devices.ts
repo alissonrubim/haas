@@ -1,6 +1,18 @@
 import { AppContext } from "@haam/app/types";
 
 export default {
+  mobile: {
+    alissons_iphone: {
+      entities: {
+        main: "mobile_app_alissons_iphone"
+      }
+    },
+    brunas_iphone: {
+      entities: {
+        main: "mobile_app_brunas_iphone"
+      }
+    }
+  },
   home: {
     calendars: {
       home: {
@@ -123,6 +135,23 @@ export default {
       }
     }
   },
+  kitchen: {
+    sensors: {
+      front_window: {
+        entities: {
+          main: "binary_sensor.kitchen_front_window_sensor_contact"
+        },
+        states: {
+          is_open: async (context: AppContext) => await context.states.getBoolean("binary_sensor.kitchen_front_window_sensor_contact") === true,
+          is_close: async (context: AppContext) => await context.states.getBoolean("binary_sensor.kitchen_front_window_sensor_contact") === false,
+        },
+        state_values: {
+          open: "on",
+          close: "off"
+        }
+      }
+    }
+  },
   living_room: {
     speakers: {
       google_display: {
@@ -155,6 +184,34 @@ export default {
         }
       }
     },
+    sensors: {
+      back_door: {
+        entities: {
+          main: "binary_sensor.living_room_back_door_sensor_contact"
+        },
+        states: {
+          is_open: async (context: AppContext) => await context.states.getBoolean("binary_sensor.living_room_back_door_sensor_contact") === true,
+          is_close: async (context: AppContext) => await context.states.getBoolean("binary_sensor.living_room_back_door_sensor_contact") === false,
+        },
+        state_values: {
+          open: "on",
+          close: "off"
+        }
+      },
+      back_window: {
+        entities: {
+          main: "binary_sensor.living_room_back_window_sensor_contact"
+        },
+        states: {
+          is_open: async (context: AppContext) => await context.states.getBoolean("binary_sensor.living_room_back_window_sensor_contact") === true,
+          is_close: async (context: AppContext) => await context.states.getBoolean("binary_sensor.living_room_back_window_sensor_contact") === false,
+        },
+        state_values: {
+          open: "on",
+          close: "off"
+        }
+      }
+    }
   },
   master_bedroom: {
     fans: {
@@ -209,23 +266,16 @@ export default {
         }
       }
     },
-    sensors: {
-      backdoor: {
-        entities: {
-          main: "binary_sensor.backdoor_sensor_contact"
-        },
-        state_values: {
-          open: "on",
-          close: "off"
-        }
-      }
-    }
   },
   entrance: {
     sensors: {
       frontdoor: {
         entities: {
-          main: "binary_sensor.frontdoor_sensor_contact"
+          main: "binary_sensor.entrance_front_door_sensor_contact"
+        },
+        states: {
+          is_open: async (context: AppContext) => await context.states.getBoolean("binary_sensor.entrance_front_door_sensor_contact") === true,
+          is_close: async (context: AppContext) => await context.states.getBoolean("binary_sensor.entrance_front_door_sensor_contact") === false,
         },
         state_values: {
           open: "on",

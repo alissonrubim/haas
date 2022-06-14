@@ -39,18 +39,20 @@ export class HassApp {
       const id = path.basename(file).split('_')[0];
       
       const fileImport = await import(`${file}`);
-      const subscriptions = await fileImport.default(haam.instance as AppContext) as AppSubscription[];
+      if(typeof fileImport.default === "function"){
+        const subscriptions = await fileImport.default(haam.instance as AppContext) as AppSubscription[];
 
-      subscriptions.forEach((subscription, subscriptionIndex) => {
-        haam.subscribe({
-          id: `${id}_${subscriptionIndex}`,
-          enabled: subscription.enabled === false ? false : true,
-          name: path.basename(file),
-          config: subscription.subscription,
-          handler: subscription.handler,
-          condition: subscription.condition
+        subscriptions.forEach((subscription, subscriptionIndex) => {
+          haam.subscribe({
+            id: `${id}_${subscriptionIndex}`,
+            enabled: subscription.enabled === false ? false : true,
+            name: path.basename(file),
+            config: subscription.subscription,
+            handler: subscription.handler,
+            condition: subscription.condition
+          })
         })
-      })
+      }
     })
 
     await haam.start();

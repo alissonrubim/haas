@@ -8,9 +8,9 @@ export default async function register(context: AppContext): Promise<AppSubscrip
     subscription: {
       byTrigger: [{
         platform: "state",
-        entityId: devices.backyard.sensors.backdoor.entities.main,
-        from: devices.backyard.sensors.backdoor.state_values.close,
-        to: devices.backyard.sensors.backdoor.state_values.open
+        entityId: devices.living_room.sensors.back_door.entities.main,
+        from: devices.living_room.sensors.back_door.state_values.close,
+        to: devices.living_room.sensors.back_door.state_values.open
       }]
     },
     condition: async () => {
@@ -20,17 +20,15 @@ export default async function register(context: AppContext): Promise<AppSubscrip
       await devices.backyard.lights.all.actions.turn_on(context),
       await devices.home.controls.should_turn_off_backyard_lights_automatically.actions.turn_on(context);
     }
-  }
-  , 
-  {
+  },{
     enabled: true,
     description: "Turn off backyard lights when the backdoor closes",
     subscription: {
       byTrigger: [{
         platform: "state",
-        entityId: devices.backyard.sensors.backdoor.entities.main,
-        from: devices.backyard.sensors.backdoor.state_values.open,
-        to: devices.backyard.sensors.backdoor.state_values.close
+        entityId: devices.living_room.sensors.back_door.entities.main,
+        from: devices.living_room.sensors.back_door.state_values.open,
+        to: devices.living_room.sensors.back_door.state_values.close
       }]
     },
     condition: async () => {

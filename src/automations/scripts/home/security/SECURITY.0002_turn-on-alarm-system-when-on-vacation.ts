@@ -19,12 +19,11 @@ export default async function register(context: AppContext): Promise<AppSubscrip
       await sendNotification(context,  {
         app: { 
           title: "Alarm System",
-          message: "Alarm System is turned on automatically."
+          message: "Alarm System is turned on and your home is protected! Have a nice vacation."
         }
       })
     }
-  },
-  {
+  },{
     enabled: true,
     description: "When on_vacation is false, turn off alarm system",
     subscription: {
@@ -39,8 +38,8 @@ export default async function register(context: AppContext): Promise<AppSubscrip
       await devices.home.configuration.alarm_system.actions.turn_off(context)
       await sendNotification(context,  {
         app: { 
-          title: "Alarm System",
-          message: "Alarm System is turned off automatically."
+          title: "Security System",
+          message: "Well come back! Alarm system is turned off."
         }
       })
     }
