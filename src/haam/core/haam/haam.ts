@@ -1,5 +1,5 @@
 import * as cron from 'node-cron';
-import { processSubscriptionsByTrigger } from './byTrigger/processSubscriptionsByTrigger';
+import { processSubscriptionsByTrigger } from './processSubscriptionsByTrigger';
 import { 
   HomeAssistantInstance, 
 } from '../services/homeAssistantInstance';
@@ -89,13 +89,13 @@ export class Haam {
     }
   }
 
-  public fireSubscriptionById(id: string){
-    const registeredSubscription = this.#subscriptions.find((x) => x.id === id && x._isProcessed); 
-    if(registeredSubscription)
-      this.fireSubscription(registeredSubscription, {})
-    else
-      throw new Error(`Subscription ${id} not found!`);
-  }
+  // public fireSubscriptionById(id: string){
+  //   const registeredSubscription = this.#subscriptions.find((x) => x.id === id && x._isProcessed); 
+  //   if(registeredSubscription)
+  //     this.fireSubscription(registeredSubscription, {})
+  //   else
+  //     throw new Error(`Subscription ${id} not found!`);
+  // }
 
   public async start(){
     console.info("Starting Haas...");

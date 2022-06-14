@@ -1,4 +1,5 @@
 import { AppContext, AppSubscription } from "@haam/app/types";
+import { CalendarPlatformEventArgs } from "@haam/core/haam/platforms";
 import devices from '../../../devices';
 
 type options = 
@@ -18,7 +19,7 @@ export default async function register(context: AppContext): Promise<AppSubscrip
       entityId: devices.home.calendars.cyclus.entities.main
     }],
     action: async (evt) => {
-      const calendarEvent = evt.triggerEventArgs.calendar_event;
+      const calendarEvent = (evt as CalendarPlatformEventArgs).data.calendar_event;
       const eventSummary = calendarEvent.summary.toLowerCase();
 
       let trashType: options = "None";

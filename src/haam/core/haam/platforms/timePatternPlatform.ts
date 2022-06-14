@@ -39,3 +39,13 @@ export function timePatternPlatformResolver(config: TimePatternPlatform){
     ...data
   }
 }
+
+export interface TimePatternPlatformEventArgs {
+  platform: "time_pattern",
+  data: {
+    id: string,
+    idx: string,
+    platform: string,
+    //MISSING....
+  }
+}

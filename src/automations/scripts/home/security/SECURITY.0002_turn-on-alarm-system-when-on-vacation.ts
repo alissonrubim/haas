@@ -12,7 +12,7 @@ export default async function register(context: AppContext): Promise<AppSubscrip
       from: 'off',
       to: 'on'
     }],
-    action: async () => {
+    action: async (evt) => {
       await devices.home.configuration.alarm_system.actions.turn_on(context)
       await sendNotification(context,  {
         app: { 

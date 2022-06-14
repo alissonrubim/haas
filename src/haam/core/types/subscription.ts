@@ -1,5 +1,7 @@
-import { SubscriptionArgs } from './subscriptionArgs';
-import { TriggerConfig } from "../haam/byTrigger/processSubscriptionsByTrigger"
+import { StatePlatformEventArgs } from "../haam/platforms"
+import { TriggerConfig } from "../haam/processSubscriptionsByTrigger"
+import { SubscriptionArgs } from "./subscriptionArgs"
+
 
 export interface Subscription {
   enabled: boolean,

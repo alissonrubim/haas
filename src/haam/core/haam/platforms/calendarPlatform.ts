@@ -27,19 +27,19 @@ export function calendarPlatformResolver(config: CalendarPlatform){
   }
 }
 
-
-/*
-{
-  id: '0',
-  idx: '0',
-  platform: 'calendar',
-  event: 'start',
-  calendar_event: {
-    start: '2022-06-08T17:00:00+02:00',
-    end: '2022-06-08T17:30:00+02:00',
-    summary: 'Um test 2',
-    all_day: false,
-    description: 'Corpo do teste 2'
+export interface CalendarPlatformEventArgs {
+  platform: "calendar",
+  data: {
+    id: string,
+    idx: string,
+    platform: string,
+    event: string,
+    calendar_event: {
+      start: Date,
+      end: Date,
+      summary: string,
+      all_day: boolean,
+      description: string
+    }
   }
 }
-*/

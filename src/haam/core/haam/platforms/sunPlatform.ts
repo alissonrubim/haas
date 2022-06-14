@@ -11,3 +11,13 @@ export function sunPlatformResolver(config: SunPlatform){
     offste: config.offset
   }
 }
+
+export interface SunPlatformEventArgs {
+  platform: "sun",
+  data: {
+    id: string,
+    idx: string,
+    platform: string,
+    //MISSING....
+  }
+}

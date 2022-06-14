@@ -1,5 +1,5 @@
-import { HomeAssistantInstance } from "../../services/homeAssistantInstance";
-import { Subscription, SubscriptionArgs } from "../../types";
+import { HomeAssistantInstance } from "../services/homeAssistantInstance";
+import { Subscription, SubscriptionArgs } from "../types";
 import { 
   StatePlatform, 
   statePlatformResolver,
@@ -53,7 +53,8 @@ export async function processSubscriptionsByTrigger(
       const triggerScope = getTriggerScope(trigger);
       const subscriptionId = await hai.subscribeToTrigger(triggerScope, async (evt: any) => {
         const args = {
-          triggerEventArgs: evt
+          platform: trigger.platform,
+          data: evt
         }
         await fireSubscriptionHandler(sub, args)
       })

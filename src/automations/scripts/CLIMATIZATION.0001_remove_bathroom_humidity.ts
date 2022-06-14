@@ -1,4 +1,5 @@
 import { AppContext, AppSubscription } from "@haam/app/types";
+import { StatePlatformEventArgs } from "@haam/core/haam/platforms";
 import devices from '../devices';
 
 export default async function register(context: AppContext): Promise<AppSubscription[]>{
@@ -13,7 +14,7 @@ export default async function register(context: AppContext): Promise<AppSubscrip
     },
     condition: async (evt) => {
       const isVentilationOff = await devices.bathroom.switches.ventilation.states.is_off(context);
-      return isVentilationOff && parseFloat(evt.triggerEventArgs.to_state.state) >= humidyLevelThreshold;
+      return isVentilationOff && parseFloat((evt as StatePlatformEventArgs).data.to_state.state) >= humidyLevelThreshold;
     },
     action: async (evt) => {
       await devices.bathroom.switches.ventilation.actions.turn_on(context);
@@ -28,7 +29,7 @@ export default async function register(context: AppContext): Promise<AppSubscrip
     },
     condition: async (evt) => {
       const isVentilationOn = await devices.bathroom.switches.ventilation.states.is_on(context);
-      return isVentilationOn && parseFloat(evt.triggerEventArgs.to_state.state) < humidyLevelThreshold;
+      return isVentilationOn && parseFloat((evt as StatePlatformEventArgs).data.to_state.state) < humidyLevelThreshold;
     },
     action: async (evt) => {
       await devices.bathroom.switches.ventilation.actions.turn_off(context);

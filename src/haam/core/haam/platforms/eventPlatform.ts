@@ -11,3 +11,13 @@ export function eventPlatformResolver(config: EventPlatform){
     event_data: config.eventData
   }
 }
+
+export interface EventPlatformEventArgs {
+  platform: "event",
+  data: {
+    id: string,
+    idx: string,
+    platform: string,
+    //MISSING....
+  }
+}

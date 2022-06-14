@@ -1,4 +1,5 @@
 import { AppContext, AppSubscription } from "@haam/app/types";
+import { CalendarPlatformEventArgs } from "@haam/core/haam/platforms";
 import devices from '../../../devices';
 
 export default async function register(context: AppContext): Promise<AppSubscription[]>{
@@ -34,7 +35,7 @@ export default async function register(context: AppContext): Promise<AppSubscrip
       entityId: devices.home.calendars.home.entities.main
     }],
     action: async (evt) => {
-      const calendarEvent = evt.triggerEventArgs.calendar_event;
+      const calendarEvent = (evt as CalendarPlatformEventArgs).data.calendar_event;
       const event = events.find((e) => `[${e.event}]` === calendarEvent.summary);
       if(event)
         await event.onStart(calendarEvent);
@@ -48,7 +49,7 @@ export default async function register(context: AppContext): Promise<AppSubscrip
       entityId: devices.home.calendars.home.entities.main
     }],
     action: async (evt) => {
-      const calendarEvent = evt.triggerEventArgs.calendar_event;
+      const calendarEvent = (evt as CalendarPlatformEventArgs).data.calendar_event;
       const event = events.find((e) => `[${e.event}]` === calendarEvent.summary);
       if(event)
         await event.onEnd(calendarEvent);

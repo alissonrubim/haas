@@ -20,3 +20,14 @@ export function timePlatformResolver(config: TimePlatform){
     at
   }
 }
+
+
+export interface TimePlatformEventArgs {
+  platform: "time",
+  data: {
+    id: string,
+    idx: string,
+    platform: string,
+    //MISSING....
+  }
+}

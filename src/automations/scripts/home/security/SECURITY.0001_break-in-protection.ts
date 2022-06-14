@@ -1,9 +1,10 @@
 import { AppContext, AppSubscription } from "@haam/app/types";
-import { TriggerConfig } from "@haam/core/haam/byTrigger/processSubscriptionsByTrigger";
+import { TriggerConfig } from "@haam/core/haam/processSubscriptionsByTrigger";
 import devices from '../../../devices';
 import { sendNotification } from "../../../helpers/sendNotificationHelper";
 import SecuritySensors from "../../../helpers/security/SecutirySensors";
 import DisableAlarmSystemAction from '../../../helpers/security/DisableAlarmSystemAction'
+import { StatePlatformEventArgs } from "@haam/core/haam/platforms";
 
 const generateTrigger = (entity: any): TriggerConfig  => {
   return {
@@ -28,7 +29,7 @@ export default async function register(context: AppContext): Promise<AppSubscrip
       await sendNotification(context, {
         app: {
           title: "Security System!",
-          message: `Sensor ${evt.triggerEventArgs.to_state.attributes.friendly_name} was opened!`,
+          message: `Sensor ${(evt as StatePlatformEventArgs).data.to_state.attributes?.friendly_name} was opened!`,
           actions: [{
             action: DisableAlarmSystemAction,
             title: "Disable Alarm System"
@@ -55,7 +56,7 @@ export default async function register(context: AppContext): Promise<AppSubscrip
         await sendNotification(context, {
           app: {
             title: "Security System!",
-            message: `Someone is breaking into the house. Catched by ${evt.triggerEventArgs.to_state.attributes.friendly_name}.`,
+            message: `Someone is breaking into the house. Catched by ${(evt as StatePlatformEventArgs).data.to_state.attributes.friendly_name}.`,
             actions: [{
               action: DisableAlarmSystemAction,
               title: "Disable Alarm System"

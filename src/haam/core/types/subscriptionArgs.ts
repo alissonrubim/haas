@@ -1,5 +1,10 @@
-import { HomeAssistantEntityState } from "../gateways/presentations";
+import { CalendarPlatformEventArgs, EventPlatformEventArgs, MqttPlatformEventArgs, StatePlatformEventArgs, SunPlatformEventArgs, TimePatternPlatformEventArgs, TimePlatformEventArgs } from "../haam/platforms";
 
-export interface SubscriptionArgs {
-  triggerEventArgs?: any
-}
+export type SubscriptionArgs =
+  CalendarPlatformEventArgs |
+  EventPlatformEventArgs |
+  MqttPlatformEventArgs |
+  StatePlatformEventArgs |
+  SunPlatformEventArgs |
+  TimePatternPlatformEventArgs | 
+  TimePlatformEventArgs
