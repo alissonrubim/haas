@@ -6,7 +6,7 @@ COPY . /
 
 RUN yarn --silent
 
-RUN ls
+VOLUME /automations/scripts
 
 # Step - When start the image, run the yarn start
 CMD ["yarn", "workspace", "automations", "start"]

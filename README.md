@@ -6,12 +6,18 @@
   The idea is to make it easy to write automations on your own way. You just need a function that returns a configuration object and that's it.
 
 ## Getting start
-  `yarn`
+  The project run `NodeJs` with `Typescript`. To start you own project, you don't need to do much, just run `yarn` to install the dependecies.
+
+  The project is based on 3 other projects
+    - /automations
+    - /haam/core
+    - /haam/app
 
 ## Deploying to DockerHub
 
-### Build image
+### 1. Build image
 `docker build . --tag alissonrubim/home-assistant-automation-manager:latest`
 
-### Pushing to DockerHub
+### 2. Pushing to DockerHub
  `docker push alissonrubim/home-assistant-automation-manager:latest`
+

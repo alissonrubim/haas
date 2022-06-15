@@ -13,7 +13,7 @@
   },
   "private": "true",
   "workspaces": [
-    "src/haam/*",
-    "src/automations"
+    "haam/*",
+    "automations"
   ]
 }
