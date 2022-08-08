@@ -15,11 +15,19 @@ export default class HomeAssistantWebSocketGateway {
   }
 
   public async connect() {
-    this.#currentConnection = await createClient({
-      host: this.#host,
-      port: this.#port,
-      token: this.#accessToken
-    });
+    try {
+      this.#currentConnection = await createClient({
+        host: this.#host,
+        port: this.#port,
+        token: this.#accessToken
+      });
+      
+      this.#currentConnection.on("ws_error", () => {
+        console.info("AAAAAA")
+      })
+    } catch(e) {
+      throw new Error("Unable to connect to HomeAssistant")
+    }
   }
 
   public async getStates(): Promise<HomeAssistantEntityState[] | undefined> {

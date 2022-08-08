@@ -1,10 +1,10 @@
 import { AppContext, AppSubscription } from "@haam/app/types";
-import { TriggerConfig } from "@haam/core/haam/processSubscriptionsByTrigger";
+import { TriggerConfig } from "@haam/core/processors/processSubscriptionsByTrigger";
 import devices from '../../../devices';
 import { sendNotification } from "../../../helpers/sendNotificationHelper";
 import SecuritySensors from "../../../helpers/security/SecutirySensors";
 import DisableAlarmSystemAction from '../../../helpers/security/DisableAlarmSystemAction'
-import { StatePlatformEventArgs } from "@haam/core/haam/platforms";
+import { StatePlatformEventArgs } from "@haam/core/processors/platforms";;
 
 const generateTrigger = (entity: any): TriggerConfig  => {
   return {

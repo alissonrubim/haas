@@ -1,5 +1,5 @@
 import { AppContext, AppSubscription } from "@haam/app/types";
-import { CalendarPlatformEventArgs } from "@haam/core/haam/platforms";
+import { CalendarPlatformEventArgs } from "@haam/core/processors/platforms";;
 import devices from '../../../devices';
 
 enum TrashOptions {

@@ -1,5 +1,5 @@
 import { AppContext, AppSubscription } from "@haam/app/types";
-import { StatePlatformEventArgs } from "@haam/core/haam/platforms";
+import { StatePlatformEventArgs } from "@haam/core/processors/platforms";
 import devices from '../../devices';
 
 export default async function register(context: AppContext): Promise<AppSubscription[]>{
