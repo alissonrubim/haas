@@ -17,9 +17,9 @@ interface RegisteredSubscription extends Subscription {
 }
 
 export class HaamCore {
-  #subscriptions: RegisteredSubscription[] = [];
-  #homeAssistantInstance: HomeAssistantInstance;
-  instance: HomeAssistantInstancePublic;
+  private registeredSubscriptions: RegisteredSubscription[] = [];
+  private homeAssistantInstance: HomeAssistantInstance;
+  public instance: HomeAssistantInstancePublic;
 
   private async fireSubscription(sub: Subscription, args: SubscriptionArgs){
     try{
@@ -37,22 +37,22 @@ export class HaamCore {
     if(sub._isProcessed)
       throw new Error(`Subscriotion ${sub.id} already processed!`)
     
-    sub._eventsControll.triggersSubscriptions = (await processSubscriptionsByTrigger(this.#homeAssistantInstance, sub, this.fireSubscription)).map((x) => ({ id: x }));
+    sub._eventsControll.triggersSubscriptions = (await processSubscriptionsByTrigger(this.homeAssistantInstance, sub, this.fireSubscription)).map((x) => ({ id: x }));
     sub._isProcessed = true;
   }
 
   private async processSubscriptions(){
-    for(const sub of this.#subscriptions.filter((x) => !x._isProcessed))
+    for(const sub of this.registeredSubscriptions.filter((x) => !x._isProcessed))
       await this.processSubscription(sub);
   }
 
   constructor(host: string, port: number, accessToken: string) {
-    this.#homeAssistantInstance = new HomeAssistantInstance(host, port, accessToken);
-    this.instance = this.#homeAssistantInstance.getExposedInstance();
+    this.homeAssistantInstance = new HomeAssistantInstance(host, port, accessToken);
+    this.instance = this.homeAssistantInstance.getExposedInstance();
   }
 
   public async process(sub: Subscription){
-    const subscription = this.#subscriptions.find((x) => x.id === sub.id);
+    const subscription = this.registeredSubscriptions.find((x) => x.id === sub.id);
     if(!subscription)
       throw new Error(`Unable to process subscriotion ${sub.id}. It was not found!`)
     
@@ -60,9 +60,9 @@ export class HaamCore {
   }
 
   public subscribe(sub: Subscription){
-    const subscription = this.#subscriptions.find((x) => x.id === sub.id);
+    const subscription = this.registeredSubscriptions.find((x) => x.id === sub.id);
     if(!subscription){
-      this.#subscriptions.push({
+      this.registeredSubscriptions.push({
         ...sub,
         _isProcessed: false,
         _eventsControll: {
@@ -75,20 +75,20 @@ export class HaamCore {
   }
 
   public unsubscribe(subId: string){
-    const subscription = this.#subscriptions.find((x) => x.id === subId);
+    const subscription = this.registeredSubscriptions.find((x) => x.id === subId);
     if(subscription){
-      this.#subscriptions.splice(this.#subscriptions.indexOf(subscription), 1);
+      this.registeredSubscriptions.splice(this.registeredSubscriptions.indexOf(subscription), 1);
 
       if(subscription._isProcessed){
         subscription._eventsControll.triggersSubscriptions?.forEach((triggersSubscription) => {
-          this.#homeAssistantInstance.unsubscribeToTrigger(triggersSubscription.id)
+          this.homeAssistantInstance.unsubscribeToTrigger(triggersSubscription.id)
         })
       }
     }
   }
 
   // public fireSubscriptionById(id: string){
-  //   const registeredSubscription = this.#subscriptions.find((x) => x.id === id && x._isProcessed); 
+  //   const registeredSubscription = this.registeredSubscriptions.find((x) => x.id === id && x._isProcessed); 
   //   if(registeredSubscription)
   //     this.fireSubscription(registeredSubscription, {})
   //   else
@@ -99,12 +99,12 @@ export class HaamCore {
     console.info("Starting Haas...");
 
     console.info("\n\nConnectiong to Home Assistant...");
-    await this.#homeAssistantInstance.connect();
+    await this.homeAssistantInstance.connect();
     console.info("Conneceted successfully to Home Assistant!!");
 
     console.info(`\n\nRegistering subscriptions....`)
     await this.processSubscriptions();
-    console.info(`${this.#subscriptions.filter((x) => x._isProcessed === true).length} subscriptions registered successfully!`);
+    console.info(`${this.registeredSubscriptions.filter((x) => x._isProcessed === true).length} subscriptions registered successfully!`);
 
     console.info("\n\nHome Assistant Automation Manager has successfully started at", new Date(), "\n\n");
   }
