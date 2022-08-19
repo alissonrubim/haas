@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "yarn workspace automations start"
+    "start:server": "yarn workspace automations start",
+    "start:web": "yarn workspace @haam/web start"
   },
   "author": "",
   "license": "ISC",
